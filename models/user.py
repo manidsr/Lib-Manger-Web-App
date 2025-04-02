@@ -9,15 +9,20 @@ class User(UserMixin):
 
     @staticmethod
     def get(user_id):
+        try:
+            user_id_int = int(user_id)  # Convert to integer
+        except ValueError:
+            return None
+            
         user_data = execute_query(
             "SELECT * FROM users WHERE id = %s",
-            (user_id,),
+            (user_id_int,)  # Use integer
         )
         if user_data:
             return User(
                 id=user_data[0]['id'],
                 email=user_data[0]['email'],
-                password_hash=user_data[0]['password_hash']  # Match database column name
+                password_hash=user_data[0]['password_hash']
             )
         return None
 
@@ -34,3 +39,10 @@ class User(UserMixin):
                 password_hash=user_data[0]['password_hash']  # Match database column name
             )
         return None
+    
+    def get_id(self):
+        return str(self.id)
+    
+    @property
+    def is_authenticated(self):
+        return True

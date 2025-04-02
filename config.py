@@ -1,5 +1,5 @@
 class Config:
-    SECRET_KEY = "your-secret-key-here"  # Change this!
+    SECRET_KEY = "aa9bbb674606263b9a9a7f81737457f11bfcfa12d7c67e07"
     DB_CONFIG = {
         "host": "localhost",
         "user": "root",

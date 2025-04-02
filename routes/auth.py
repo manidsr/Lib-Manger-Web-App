@@ -15,7 +15,7 @@ def register():
 
     hashed_pw = generate_password_hash(data['password'])
     execute_query(
-        "INSERT INTO users (email, password_hash) VALUES (%s, %s)",
+        "INSERT INTO users (email, password_hash, role) VALUES (%s, %s, 'user')",
         (data['email'], hashed_pw)
     )
     

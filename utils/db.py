@@ -13,8 +13,8 @@ def execute_query(query, params=None):
         result = cursor.fetchall()
     else:
         conn.commit()
-        result = None
-        
+        result = cursor.rowcount  # Return number of affected rows
+    
     cursor.close()
     conn.close()
     return result

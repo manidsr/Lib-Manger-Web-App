@@ -1,9 +1,12 @@
+import click
 from flask import Flask
 from flask_login import LoginManager
 from flask_cors import CORS
 from config import Config
 from models.user import User
 from flask import send_from_directory
+
+from utils.auth import admin_required
 
 # Initialize extensions
 login_manager = LoginManager()
@@ -68,7 +71,8 @@ def create_tables():
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
             email VARCHAR(255) UNIQUE NOT NULL,
-            password_hash VARCHAR(255) NOT NULL
+            password_hash VARCHAR(255) NOT NULL,
+            role ENUM('admin', 'user') DEFAULT 'user' NOT NULL
         )
     ''')
     print("Tables created!")
@@ -81,6 +85,21 @@ def drop_tables():
     execute_query("DROP TABLE IF EXISTS books")
     print("All tables deleted!")
 
+@app.cli.command("promote-admin")
+@click.argument("email")
+def promote_admin(email):
+    from utils.db import execute_query
+    
+    affected_rows = execute_query(
+        "UPDATE users SET role = 'admin' WHERE email = %s",
+        (email,)
+    )
+    
+    if affected_rows == 0:
+        print(f"No user found with email: {email}")
+    else:
+        print(f"User {email} promoted to admin successfully!")
+
 # User loader required by Flask-Login
 @login_manager.user_loader
 def load_user(user_id):
@@ -89,6 +108,11 @@ def load_user(user_id):
 @app.route('/')
 def home():
     return send_from_directory('templates', 'test.html')
+
+@app.route('/Admin')
+@admin_required
+def Admin():
+    return({"message": "Logged in successfully as Admin"})
 
 if __name__ == '__main__':
     app.run(debug=True)
